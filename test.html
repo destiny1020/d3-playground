@@ -1,0 +1,41 @@
+<html>
+<head>
+	<title>Test</title>
+	<script type="text/javascript" src="d3.js"></script>
+	<style type="text/css">
+		.tentative {
+			stroke: darkgrey;
+			stroke-width: 2px;
+			stroke-dasharray: 5 5;
+			opacity: .5;
+		}
+
+		circle {
+			fill: red;
+		}
+
+		.active {
+			stroke: green;
+			stroke-width: 4px;
+			stroke-dasharray: 1;
+		}
+	</style>
+</head>
+<body>
+<!-- 	<div id="someDiv" style="width:200px;height:100px;border:black 1px solid;"></div>
+	<input id="someCheckbox" type="checkbox"></input> -->
+
+	<svg style="width:1000px;height:1000px;">
+		<g transform="translate(200,200) scale(2)">
+			<circle class="tentative" r="100"/>
+			<text>This is circle's label</text>
+		</g>
+	</svg>
+</body>
+<script type="text/javascript">
+	// d3.select("#someDiv").attr("id", "newId");
+	// d3.select("#newId").style("border", "red 5px dashed");
+	// d3.select("#someCheckbox").property("checked", true);
+	d3.select("circle").classed('active', true);
+</script>
+</html>
