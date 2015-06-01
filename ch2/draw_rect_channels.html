@@ -1,0 +1,90 @@
+<html>
+<head>
+	<title>Draw Rect --- Channels</title>
+	<script type="text/javascript" src="../d3.js"></script>
+</head>
+<body>
+
+	<div id="vizcontainer">
+		<svg style="width:500px; height:500px;"/>
+	</div>
+
+</body>
+<script type="text/javascript">
+
+	d3.json('../data/tweets.json', function(err, data) {
+		// pay attention to this
+		dataViz(data.tweets);
+	});
+
+	function dataViz(incomingData) {
+		incomingData.forEach(function(el) {
+			// create two more attributes
+			el.impact = el.favorites.length + el.retweets.length;
+			el.tweetTime = new Date(el.timestamp);
+		});
+
+		var maxImpact = d3.max(incomingData, function(el) {
+			return el.impact;
+		});
+		var startEnd = d3.extent(incomingData, function(el) {
+			return el.tweetTime;
+		});
+		var timeRamp = d3.time.scale().domain(startEnd).range([20, 480]);
+		var yScale = d3.scale.linear().domain([0, maxImpact]).range([0, 460]);
+		var radiusScale = d3.scale.linear().domain([0, maxImpact]).range([1, 20]);
+		var colorScale = d3.scale.linear().domain([0, maxImpact]).range(['white', '#990000']);
+
+		// creating labels on g elements
+		var tweetG = d3.select('svg')
+						.selectAll('g')
+						// specify the key
+						.data(incomingData, function(d) {
+							console.log('first', d);
+							return JSON.stringify(d);
+						})
+						.enter()
+						.append('g')
+						.attr('transform', function(d) {
+							return 'translate(' + timeRamp(d.tweetTime) + ', ' + (480 - yScale(d.impact)) + ')';
+						});
+
+		tweetG
+			.append('circle')
+			.attr('r', function(d) { return radiusScale(d.impact); })
+			// no need since have used g and transform attr
+			// .attr('cx', function(d, i) { return timeRamp(d.tweetTime); })
+			// .attr('cy', function(d) { return 480 - yScale(d.impact); })
+			.style('fill', function(d) { return colorScale(d.impact); })
+			.style('stroke', 'black')
+			.style('stroke-width', '1px');
+
+		// append text
+		// use text-anchor --- start, end, middle
+		tweetG.append('text')
+			.text(function(d) {
+				return d.user + '-' + d.tweetTime.getHours();
+			});
+
+		// testing exit DOM > DATA, keep only 4 circles
+		// d3.selectAll('g').data([1, 2, 3, 4]).exit().remove();
+
+		// testing update, will be 1, 2, 3, 4
+		// d3.selectAll('g').select('text').text(function(d) {
+		// 	return d;
+		// });
+
+		var filteredData = incomingData.filter(function(el) {
+			return el.impact > 0;
+		});
+
+		d3.selectAll('g')
+			.data(filteredData, function(d) {
+				console.log('second', d);
+				return JSON.stringify(d);
+			})
+			.exit()
+			.remove();
+	}
+</script>
+</html>

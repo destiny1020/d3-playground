@@ -1,0 +1,61 @@
+<html>
+<head>
+	<title>Draw Rect</title>
+	<script type="text/javascript" src="../d3.js"></script>
+</head>
+<body>
+
+	<div id="vizcontainer">
+		<svg/>
+	</div>
+
+</body>
+<script type="text/javascript">
+
+	d3.csv('../data/cities.csv', function(err, data) {
+		// console.log(data);
+		dataViz(data);
+	});
+
+	function dataViz(incomingData) {
+		var maxPopulation = d3.max(incomingData, function(el) {
+			return parseInt(el.population);
+		});
+
+		// linear
+		var yScale = d3.scale.linear().domain([0, maxPopulation]).range([0, 460]);
+
+		d3.select('svg')
+			.attr('style', 'height: 480px; width: 600px');
+
+		// polylinear
+		var yScalePoly = d3.scale.linear().domain([0, 100, 1000, 24500]).range([0, 50, 75, 100]);
+
+		// with clamp and poly
+		var yScaleClamp = d3.scale.linear().domain([0, 100, 500]).range([0, 50, 100]).clamp(true);
+
+		d3.select('svg')
+			.selectAll('rect')
+			// .data([15, 50, 22, 8, 100, 10])
+			.data(incomingData)
+			.enter()
+			.append('rect')
+			.attr('width', 50)
+			.attr('height', function(d, i) {
+				// use scale to get height
+				return yScale(parseInt(d.population));
+			})
+			.style('fill', 'blue')
+			.style('stroke', 'red')
+			.style('stroke-width', '1px')
+			.style('opacity', .25)
+			.attr('x', function(d, i) {
+				return i * 60;
+			})
+			.attr('y', function(d) {
+				// use scale to get y coordinator
+				return 480 - yScale(parseInt(d.population));
+			});
+	}
+</script>
+</html>

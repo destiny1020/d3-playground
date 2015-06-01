@@ -1,0 +1,31 @@
+<html>
+<head>
+	<title>Load Data</title>
+	<script type="text/javascript" src="../d3.js"></script>
+</head>
+<body>
+
+</body>
+<script type="text/javascript">
+	d3.csv('../data/cities.csv', function(err, data) {
+		// console.log(data);
+		dataViz(data);
+	});
+
+	function dataViz(data) {
+		d3.select('body')
+			.selectAll('div.cities')
+			.data(data)
+			.enter()
+			.append('div')
+			.attr('class', 'cities')
+			.html(function(d, i) {
+				return d.label;
+			});
+	}
+
+	// d3.json('../data/tweets.json', function(data) {
+	// 	console.log(data);
+	// });
+</script>
+</html>
