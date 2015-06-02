@@ -160,5 +160,24 @@ function createSoccerViz() {
 				.classed('active', false)
 				.attr('y', 30);
 		});
+
+		// bing images
+		d3.selectAll('g.overallG')
+			.insert('image', 'text')
+			.attr('xlink:href', function(d) {
+				return '../images/' + d.team + '.png';
+			})
+			.attr('width', '45px')
+			.attr('height', '20px')
+			.attr('x', '-22')
+			.attr('y', '-10');
+
+		// load html
+		d3.text('modal.html', function(data) {
+			d3.select('body')
+				.append('div')
+				.attr('id', 'modal')
+				.html(data);
+		});
 	}
 }
