@@ -77,14 +77,14 @@ function createSoccerViz() {
 		}
 
 		// use category10
+		var tenColorScale = d3.scale.category10(
+				['UEFA', 'CONMEBOL', 'CAF', 'AFC']
+			);
 		function buttonClick2(datapoint) {
 			var maxValue = d3.max(incomingData, function(el) {
 				return parseFloat(el[datapoint]);
 			});
-
-			var tenColorScale = d3.scale.category10(
-					['UEFA', 'CONMEBOL', 'CAF', 'AFC']
-				);
+			
 			var radiusScale = d3.scale.linear().domain([0, maxValue]).range([2, 20]);
 
 			d3.selectAll('g.overallG')
@@ -179,5 +179,63 @@ function createSoccerViz() {
 				.attr('id', 'modal')
 				.html(data);
 		});
+
+		teamG.on('click', teamClick);
+
+		function teamClick(d) {
+			d3.selectAll('td.data')
+				.data(d3.values(d))
+				.html(function(p) {
+					return p;
+				});
+		}
+
+		// load svg
+		d3.html('../images/icon.svg', loadSvg);
+
+		function loadSvg(svgData) {
+			// option 1: use while to append
+			// while(!d3.select(svgData).selectAll('path').empty()) {
+			// 	d3.select('svg')
+			// 		.node()
+			// 		.appendChild(
+			// 			d3.select(svgData).select('path').node()
+			// 		);
+			// }
+
+			// option 2: use each
+			// d3.select(svgData).selectAll('path').each(function() {
+			// 	// here the svgData will be changed unless use this.cloneNode(true)
+			// 	d3.select('svg').node().appendChild(this);
+			// });
+
+			// d3.selectAll('path').attr('transform', 'translate(50, 50)');
+
+			// clone all paths to the g elements
+			d3.selectAll('g').each(function() {
+				var gParent = this;
+				d3.select(svgData).selectAll('path').each(function() {
+					gParent.appendChild(this.cloneNode(true));
+				});
+			});
+
+			// change the football style
+			// d3.selectAll('path')
+				// .style('fill', 'darkred')
+				// .style('stroke', 'black')
+				// .style('stroke-width', '1px');
+
+			// rebind the data --- datum
+			d3.selectAll('g.overallG').each(function(d) {
+				d3.select(this)
+					.selectAll('path')
+					.datum(d)
+					.style('fill', function(p) {
+						return tenColorScale(p.region);
+					})
+					.style('stroke', 'black')
+					.style('stroke-width', '1px');
+			});
+		}
 	}
 }
